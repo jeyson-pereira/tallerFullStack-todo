@@ -76,4 +76,13 @@ public class TodoController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @PatchMapping("/todos/{id}/completed")
+    public ResponseEntity<?> updateCompletedFromTodo(@PathVariable("id") Long id, @RequestBody TodoModel todo) {
+        Optional<TodoModel> singleTodo = todoService.getTodoById(id);
+        if (singleTodo.isPresent()) {
+            todoService.updateCompleted(id,todo);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
 }

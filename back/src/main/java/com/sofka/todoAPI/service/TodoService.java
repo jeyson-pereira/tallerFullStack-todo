@@ -5,6 +5,7 @@ import com.sofka.todoAPI.model.TodoModel;
 import com.sofka.todoAPI.repository.TodoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -57,4 +58,12 @@ public class TodoService {
             return false;
         }
     }
+
+    @Transactional
+    public TodoModel updateCompleted(Long id, TodoModel todo) {
+        todo.setId(id);
+        todoRepository.updateCompleted(id, todo.getCompleted());
+        return todo;
+    }
+
 }
