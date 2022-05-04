@@ -27,6 +27,7 @@
   color: gray;
   font-family: FontAwesome;
   user-select: none;
+  padding: 10px;
 }
 
 .Icon-check {

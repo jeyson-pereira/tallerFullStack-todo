@@ -1,20 +1,35 @@
-import React from 'react';
-import { useLocalStorage } from './useLocalStorage';
+import React, { useState, useEffect } from 'react';
+import todoServices from '../../services/todoServices';
 
 const TodoContext = React.createContext();
 
 function TodoProvider(props) {
-  const {
-    item: todos,
-    saveItem: saveTodos,
-    loading,
-    error,
-  } = useLocalStorage('TODOS_V1', []);
-  const [searchValue, setSearchValue] = React.useState('');
-  const [openModal, setOpenModal] = React.useState(false);
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const completedTodos = todos.filter(todo => !!todo.completed).length;
-  const totalTodos = todos.length;
+  const [searchValue, setSearchValue] = useState("");
+  const [openModal, setOpenModal] = useState(false);
+
+  const [todos, setTodos] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+
+  useEffect(() => {
+    todoServices
+      .getAll()
+      .then((response) => {
+        setTodos(response.data);
+        setLoading(false);
+      })
+      .catch((e) => {
+        setLoading(false);
+        setError(e);
+        console.log(e);
+      });
+
+    return () => {
+      setRefresh(false);
+    };
+  }, [refresh]);
 
   let searchedTodos = [];
 
@@ -29,28 +44,45 @@ function TodoProvider(props) {
   }
 
   const addTodo = (text) => {
-    const newTodos = [...todos];
-    newTodos.push({
-      completed: false,
-      text,
-    });
-    saveTodos(newTodos);
+    let newTodo = { text: text, completed: false };
+    todoServices
+      .create(newTodo)
+      .then((response) => {
+        console.log(`Todo created, status:${response.status}`);
+        setRefresh(true);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   };
 
-  const completeTodo = (text) => {
-    const todoIndex = todos.findIndex(todo => todo.text === text);
-    const newTodos = [...todos];
-    newTodos[todoIndex].completed = !newTodos[todoIndex].completed;
-    saveTodos(newTodos);
+  const completeTodo = (id, newCompleted) => {
+    todoServices
+      .updateCompleted(id, { completed: newCompleted })
+      .then((response) => {
+        console.log(`Completed from todo updated, status:${response.status}`);
+        setRefresh(true);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   };
 
-  const deleteTodo = (text) => {
-    const todoIndex = todos.findIndex(todo => todo.text === text);
-    const newTodos = [...todos];
-    newTodos.splice(todoIndex, 1);
-    saveTodos(newTodos);
+  const deleteTodo = (id) => {
+    todoServices
+      .delete(id)
+      .then((response) => {
+        console.log(`Todo deleted, status:${response.status}`);
+        setRefresh(true);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   };
-  
+
+  const completedTodos = todos.filter((todo) => !!todo.completed).length;
+  const totalTodos = todos.length;
+
   return (
     <TodoContext.Provider value={{
       loading,

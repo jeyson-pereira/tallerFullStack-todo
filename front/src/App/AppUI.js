@@ -28,15 +28,15 @@ function AppUI() {
       <TodoList>
         {error && <p className="Info-text">Desespérate, hubo un error...</p>}
         {loading && <p className="Info-text">Estamos cargando, no desesperes...</p>}
-        {!loading && !searchedTodos.length && <p className="Info-text">¡Crea tu primer TODO!</p>}
+        {!loading && !searchedTodos.length && !error &&<p className="Info-text">¡Crea tu primer TODO!</p>}
 
         {searchedTodos.map(todo => (
           <TodoItem
-            key={todo.text}
+            key={todo.id}
             text={todo.text}
             completed={todo.completed}
-            onComplete={() => completeTodo(todo.text)}
-            onDelete={() => deleteTodo(todo.text)}
+            onComplete={() => completeTodo(todo.id, !todo.completed)}
+            onDelete={() => deleteTodo(todo.id)}
           />
         ))}
       </TodoList>
