@@ -1,0 +1,6 @@
+.Info-text {
+  display: flex;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1rem;
+}
